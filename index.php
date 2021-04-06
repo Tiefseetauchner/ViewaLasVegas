@@ -9,14 +9,22 @@ spl_autoload_register(function ($class_name) {
 function var_dump_pre($mixed = null)
 {
   echo '<pre>';
-  var_dump($mixed);
+  echo htmlspecialchars(var_dump_ret($mixed));
   echo '</pre>';
   return null;
 }
 
+function var_dump_ret($mixed = null) {
+  ob_start();
+  var_dump($mixed);
+  $content = ob_get_contents();
+  ob_end_clean();
+  return $content;
+}
+
 function run_commands($template)
 {
-  preg_match_all("/[{]{2} START (\p{L}+) (.*) [}]{2}/umi", $template, $matches);
+  preg_match_all("/[{]{2} START (\p{L}+) (.*) [}]{2}/ui", $template, $matches);
   var_dump_pre($matches);
   echo "<hr>";
 
@@ -30,7 +38,13 @@ function run_commands($template)
 
 function run_loop($template, $args)
 {
-  var_dump($args);
+  $loopName = explode(" ", $args)[0];
+  preg_match("/[{]{2} START LOOP $args [}]{2}" .
+    ".*" .
+    "[{]{2} END $loopName [}]{2}/uis",
+    $template, $loopMatch);
+  var_dump_pre($this->{$loopName});
+  var_dump_pre($loopMatch);
 }
 
 $hotels = [
