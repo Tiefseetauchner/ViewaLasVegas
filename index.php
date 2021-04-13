@@ -14,7 +14,8 @@ function var_dump_pre($mixed = null)
   return null;
 }
 
-function var_dump_ret($mixed = null) {
+function var_dump_ret($mixed = null)
+{
   ob_start();
   var_dump($mixed);
   $content = ob_get_contents();
@@ -22,29 +23,21 @@ function var_dump_ret($mixed = null) {
   return $content;
 }
 
-function run_commands($template)
+function insertHotels($template, $placeholder, array $data)
 {
-  preg_match_all("/[{]{2} START (\p{L}+) (.*) [}]{2}/ui", $template, $matches);
-  var_dump_pre($matches);
-  echo "<hr>";
+  $content = "<table>";
 
-  for ($i = 0; $i < count($matches[0]); $i++) {
-    switch ($matches[1][$i]) {
-      case "LOOP":
-        run_loop($template, $matches[2][$i]);
-    }
+  foreach ($data as $dataELement) {
+    $content .= "<tr>";
+    $content .= "<td>" . $dataELement->name . "</td>";
+    $content .= "<td>" . $dataELement->description . "</td>";
+    $content .= "<td>" . $dataELement->addressLine . "<br />" . $dataELement->city . "</td>";
+    $content .= "</tr>";
   }
-}
 
-function run_loop($template, $args)
-{
-  $loopName = explode(" ", $args)[0];
-  preg_match("/[{]{2} START LOOP $args [}]{2}" .
-    ".*" .
-    "[{]{2} END $loopName [}]{2}/uis",
-    $template, $loopMatch);
-  var_dump_pre($this->{$loopName});
-  var_dump_pre($loopMatch);
+  $content .= "</table>";
+
+  return str_replace($placeholder, $content, $template);
 }
 
 $hotels = [
@@ -61,6 +54,6 @@ $hotels = [
 
 $template = file_get_contents("template.html");
 
-run_commands($template);
+$template = insertHotels($template, "{{ HOTELS }}", $hotels);
 
 echo $template;

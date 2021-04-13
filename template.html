@@ -11,14 +11,6 @@
 <h1>Viva Las Vegas</h1>
 <p>Information about all the hotels in Las Vegas!</p>
 
-<table>
-    {{ START LOOP hotels Hotel }}
-    <tr>
-        <td><h2>{{ name }}</h2></td>
-        <td><p>{{ description }}</p></td>
-        <td><small>{{ addressLine }}<br>{{ city }}</small></td>
-    </tr>
-    {{ END hotels }}
-</table>
+{{ HOTELS }}
 </body>
 </html>
