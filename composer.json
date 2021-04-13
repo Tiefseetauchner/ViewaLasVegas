@@ -1,0 +1,14 @@
+{
+  "name": "tiefseetauchner/viewalasvegas",
+  "description": "medt school project",
+  "minimum-stability": "stable",
+  "license": "CC=",
+  "authors": [
+    {
+      "name": "Christoph Tauchner",
+      "email": "7229@htl.rennweg.at"
+    }
+  ],
+  "require": {
+  }
+}
