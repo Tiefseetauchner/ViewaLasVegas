@@ -2,9 +2,13 @@
 
 namespace ViewaLasVegas;
 
-spl_autoload_register(function ($class_name) {
-  include $class_name . '.php';
-});
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
+
+require __DIR__ . '/vendor/autoload.php';
+
+include 'ViewaLasVegas/Hotel.php';
 
 function var_dump_pre($mixed = null)
 {
@@ -23,23 +27,6 @@ function var_dump_ret($mixed = null)
   return $content;
 }
 
-function insertHotels($template, $placeholder, array $data)
-{
-  $content = "<table>";
-
-  foreach ($data as $dataELement) {
-    $content .= "<tr>";
-    $content .= "<td>" . $dataELement->name . "</td>";
-    $content .= "<td>" . $dataELement->description . "</td>";
-    $content .= "<td>" . $dataELement->addressLine . "<br />" . $dataELement->city . "</td>";
-    $content .= "</tr>";
-  }
-
-  $content .= "</table>";
-
-  return str_replace($placeholder, $content, $template);
-}
-
 $hotels = [
   new Hotel("The Casino For all",
     "You heard of Casino Royal, well, we aren't royal, we're so trash that only plebs can afford being seen here!",
@@ -52,8 +39,32 @@ $hotels = [
     "A stroßn in Wean", "1170 Wien"),
 ];
 
-$template = file_get_contents("template.html");
+$app = AppFactory::create();
 
-$template = insertHotels($template, "{{ HOTELS }}", $hotels);
+$twig = Twig::create('/templates', ['cache' => '/cache']);
 
-echo $template;
+$app->add(TwigMiddleware::create($app, $twig));
+
+// Define named route
+$app->get('/hello/{name}', function ($request, $response, $args) {
+  $view = Twig::fromRequest($request);
+  return $view->render($response, 'template.html', [
+    'name' => $args['name']
+  ]);
+})->setName('profile');
+
+// Render from string
+$app->get('/hi/{name}', function ($request, $response, $args) {
+  $view = Twig::fromRequest($request);
+  $str = $view->fetchFromString(
+    '<p>Hi, my name is {{ name }}.</p>',
+    [
+      'name' => $args['name']
+    ]
+  );
+  $response->getBody()->write($str);
+  return $response;
+});
+
+// Run app
+$app->run();
