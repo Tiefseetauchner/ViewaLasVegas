@@ -10,7 +10,14 @@
 <body>
 <h1>Viva Las Vegas</h1>
 <p>Information about all the hotels in Las Vegas!</p>
-
-{{ HOTELS }}
+<table>
+    {% for item in hotels %}
+    <tr>
+        <td>{{item.name}}</td>
+        <td>{{item.description}}</td>
+        <td>{{item.addressLine}}<br/>{{item.city}}</td>
+    </tr>
+    {% endfor %}
+</table>
 </body>
 </html>

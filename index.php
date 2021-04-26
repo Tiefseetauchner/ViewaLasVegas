@@ -5,6 +5,8 @@ namespace ViewaLasVegas;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -39,32 +41,9 @@ $hotels = [
     "A stroßn in Wean", "1170 Wien"),
 ];
 
-$app = AppFactory::create();
+$loader = new FilesystemLoader('./templates');
+$twig = new Environment($loader);
 
-$twig = Twig::create('/templates', ['cache' => '/cache']);
+$template = $twig->load('template.html');
 
-$app->add(TwigMiddleware::create($app, $twig));
-
-// Define named route
-$app->get('/hello/{name}', function ($request, $response, $args) {
-  $view = Twig::fromRequest($request);
-  return $view->render($response, 'template.html', [
-    'name' => $args['name']
-  ]);
-})->setName('profile');
-
-// Render from string
-$app->get('/hi/{name}', function ($request, $response, $args) {
-  $view = Twig::fromRequest($request);
-  $str = $view->fetchFromString(
-    '<p>Hi, my name is {{ name }}.</p>',
-    [
-      'name' => $args['name']
-    ]
-  );
-  $response->getBody()->write($str);
-  return $response;
-});
-
-// Run app
-$app->run();
+echo $template->render(['hotels' => $hotels]);
